@@ -1,0 +1,96 @@
+# Backend .gitignore
+
+# Dependencies
+/node_modules
+/package-lock.json
+/yarn.lock
+/pnpm-lock.yaml
+/.pnp
+.pnp.js
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+# .env.production
+.env*.local
+
+# Build
+/dist
+/build
+/out
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+lerna-debug.log*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.project
+.classpath
+.settings/
+*.sublime-workspace
+.history/
+*.launch
+
+# OS
+.DS_Store
+Thumbs.db
+.directory
+*.bak
+*.tmp
+*~
+
+# Testing
+/coverage
+/.nyc_output
+/cypress/videos/
+/cypress/screenshots/
+
+# Temp files
+/tmp
+/temp
+/.cache
+/.eslintcache
+
+# Language specific
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.env/
+.venv/
+.pytest_cache/
+
+# Java
+*.class
+*.jar
+*.war
+target/
+.gradle/
+
+# TypeScript
+*.tsbuildinfo
+
+# Docker
+*.dockerfile
+.dockerignore
+
+# Database
+*.sqlite
+*.sqlite3
+*.db 
