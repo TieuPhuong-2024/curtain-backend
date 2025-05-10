@@ -30,6 +30,10 @@ exports.getFavorites = async (req, res) => {
         path: 'product',
         populate: { path: 'category', select: 'name' }
       })
+      .populate({
+        path: 'product',
+        populate: { path: 'color', select: 'name hexCode' }
+      })
       .lean();
 
     const transformedData = favorites.map(fav => ({
