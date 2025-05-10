@@ -1,6 +1,8 @@
 var admin = require("firebase-admin");
 
-const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+const base64String = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
+const decodedString = Buffer.from(base64String, 'base64').toString('utf-8');
+const credentials = JSON.parse(decodedString);
 
 // Ensure we only initialize the app once
 if (!admin.apps.length) {

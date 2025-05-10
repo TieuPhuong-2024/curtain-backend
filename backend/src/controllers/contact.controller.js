@@ -145,3 +145,28 @@ exports.updateContactStatus = async (req, res) => {
         });
     }
 };
+
+// Delete contact
+exports.deleteContact = async (req, res) => {
+    try {
+        const contact = await Contact.findByIdAndDelete(req.params.id);
+        
+        if (!contact) {
+            return res.status(404).json({
+                success: false,
+                message: 'Không tìm thấy yêu cầu tư vấn'
+            });
+        }
+        
+        res.json({
+            success: true,
+            message: 'Xóa yêu cầu tư vấn thành công'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Không thể xóa yêu cầu tư vấn',
+            error: error.message
+        });
+    }
+};

@@ -12,4 +12,7 @@ router.get('/', auth, contactController.getAllContacts);
 // Update contact status (admin only)
 router.put('/:id/status', auth, contactController.updateContactStatus);
 
+// Delete contact (admin only)
+router.delete('/:id', auth, contactController.deleteContact);
+
 module.exports = router;

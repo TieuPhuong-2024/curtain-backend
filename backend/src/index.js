@@ -4,7 +4,8 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 
 // Load environment variables
-dotenv.config();
+const env = process.env.NODE_ENV || 'development';
+dotenv.config({ path: `.env.${env}` });
 
 // Initialize express app
 const app = express();
@@ -24,6 +25,7 @@ const projectRoutes = require('./routes/project.routes');
 const favoriteRoutes = require('./routes/favorite.routes');
 const contactRoutes = require('./routes/contact.routes');
 const postRoutes = require('./routes/post.routes');
+const colorRoutes = require('./routes/color.routes');
 
 // Use routes
 app.use('/api/curtains', curtainRoutes);
@@ -36,6 +38,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/contacts', contactRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/colors', colorRoutes);
 
 // Basic route
 app.get('/', (req, res) => {

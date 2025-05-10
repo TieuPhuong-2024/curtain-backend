@@ -6,7 +6,12 @@ const projectSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  description: {
+  shortDescription: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  detailedContent: {
     type: String,
     required: true
   },
@@ -20,14 +25,18 @@ const projectSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  images: [{
+  thumbnail: {
     type: String,
     required: true
-  }],
-  videos: [{
-    type: String,
-    trim: true
-  }],
+  },
+  featured: {
+    type: Boolean,
+    default: false
+  },
+  published: {
+    type: Boolean,
+    default: true
+  },
   createdAt: {
     type: Date,
     default: Date.now

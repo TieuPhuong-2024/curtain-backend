@@ -3,7 +3,21 @@ const Project = require('../models/project.model');
 // Create a new project
 exports.createProject = async (req, res) => {
   try {
-    const newProject = new Project(req.body);
+    // Chỉ lấy các trường cần thiết từ request body
+    const { title, shortDescription, detailedContent, location, type, thumbnail, featured, published } = req.body;
+    
+    const projectData = {
+      title,
+      shortDescription,
+      detailedContent,
+      location,
+      type,
+      thumbnail,
+      featured: featured || false,
+      published: published !== undefined ? published : true
+    };
+    
+    const newProject = new Project(projectData);
     const savedProject = await newProject.save();
     res.status(201).json(savedProject);
   } catch (error) {
@@ -48,9 +62,29 @@ exports.getProjectById = async (req, res) => {
 // Update a project
 exports.updateProject = async (req, res) => {
   try {
+    // Chỉ lấy các trường cần thiết từ request body
+    const { title, shortDescription, detailedContent, location, type, thumbnail, featured, published } = req.body;
+    
+    const projectData = {
+      title,
+      shortDescription,
+      detailedContent,
+      location,
+      type,
+      thumbnail,
+      featured: featured || false,
+      published: published !== undefined ? published : true,
+      updatedAt: Date.now()
+    };
+    
+    // Chỉ cập nhật các trường được gửi lên (không undefined)
+    const updateData = Object.fromEntries(
+      Object.entries(projectData).filter(([_, value]) => value !== undefined)
+    );
+    
     const updatedProject = await Project.findByIdAndUpdate(
       req.params.id,
-      { ...req.body, updatedAt: Date.now() },
+      updateData,
       { new: true, runValidators: true }
     );
     
