@@ -35,18 +35,6 @@ const curtainSchema = new mongoose.Schema({
     ref: 'Color',
     required: true
   },
-  size: {
-    width: {
-      type: Number,
-      required: true,
-      min: 0
-    },
-    height: {
-      type: Number,
-      required: true,
-      min: 0
-    }
-  },
   mainImage: {
     type: String,
     required: true
