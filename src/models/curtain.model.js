@@ -11,9 +11,15 @@ const curtainSchema = new mongoose.Schema({
     required: true
   },
   price: {
-    type: Number,
-    required: true,
-    min: 0
+    type: {
+      type: String, // 'fixed', 'range', 'contact', 'discount'
+      default: 'fixed'
+    },
+    value: Number, // cho 'fixed'
+    min: Number,   // cho 'range'
+    max: Number,   // cho 'range'
+    old: Number,   // cho 'discount'
+    new: Number,   // cho 'discount'
   },
   category: {
     type: mongoose.Schema.Types.ObjectId,
