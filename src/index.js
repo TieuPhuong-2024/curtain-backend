@@ -13,41 +13,53 @@ const authMiddleware = require('./middleware/auth');
 const app = express();
 
 // Simple in-memory rate limiter (requests per window per IP)
+const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS) || 60 * 1000; // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 300;
+
 const rateLimitMap = new Map();
-const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
-const RATE_LIMIT_MAX_REQUESTS = 60; // 60 requests per minute per IP
 
 const rateLimiter = (req, res, next) => {
-  const ip = req.ip || req.connection.remoteAddress || 'unknown';
+  const ip = req.ip || req.socket.remoteAddress || 'unknown';
   const now = Date.now();
   const windowStart = now - RATE_LIMIT_WINDOW_MS;
 
-  // Clean old entries
-  for (const [key, timestamps] of rateLimitMap.entries()) {
-    const valid = timestamps.filter(t => t > windowStart);
-    if (valid.length === 0) {
-      rateLimitMap.delete(key);
-    } else {
-      rateLimitMap.set(key, valid);
-    }
-  }
+  const timestamps = (rateLimitMap.get(ip) || []).filter((time) => time > windowStart);
 
-  const timestamps = rateLimitMap.get(ip) || [];
-  const recent = timestamps.filter(t => t > windowStart);
+  res.setHeader('RateLimit-Limit', RATE_LIMIT_MAX_REQUESTS);
+  res.setHeader(
+    'RateLimit-Remaining',
+    Math.max(RATE_LIMIT_MAX_REQUESTS - timestamps.length - 1, 0)
+  );
 
-  if (recent.length >= RATE_LIMIT_MAX_REQUESTS) {
+  if (timestamps.length >= RATE_LIMIT_MAX_REQUESTS) {
+    const retryAfterSeconds = Math.max(
+      Math.ceil((timestamps[0] + RATE_LIMIT_WINDOW_MS - now) / 1000),
+      1
+    );
+    res.setHeader('RateLimit-Reset', retryAfterSeconds);
+    res.setHeader('Retry-After', retryAfterSeconds);
     return res.status(429).json({ error: 'Too many requests, please try again later' });
   }
 
-  recent.push(now);
-  rateLimitMap.set(ip, recent);
+  timestamps.push(now);
+  rateLimitMap.set(ip, timestamps);
   next();
 };
+
+// Sweep idle IPs so the map does not grow forever
+const rateLimitSweep = setInterval(() => {
+  const windowStart = Date.now() - RATE_LIMIT_WINDOW_MS;
+  for (const [ip, timestamps] of rateLimitMap.entries()) {
+    if (!timestamps.some((time) => time > windowStart)) rateLimitMap.delete(ip);
+  }
+}, RATE_LIMIT_WINDOW_MS);
+rateLimitSweep.unref();
 
 // Middleware
 const corsOptions = {
   origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
   credentials: true,
+  exposedHeaders: ['Retry-After', 'RateLimit-Limit', 'RateLimit-Remaining', 'RateLimit-Reset'],
 };
 app.use(cors(corsOptions));
 app.use(express.json());

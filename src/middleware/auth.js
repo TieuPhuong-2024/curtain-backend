@@ -37,14 +37,26 @@ module.exports = async function (req, res, next) {
       return res.status(403).json({ error: 'User account has been disabled' });
     }
 
-    // Attach user info to request (role from Firebase Custom Claims)
+    // Role source of truth is Firestore (users/{uid}.role), same as the client's AuthContext.
+    // Custom claims are only a fallback because they are not set for existing accounts.
+    let role = decodedToken.role || 'user';
+    try {
+      const userDoc = await admin.firestore().collection('users').doc(decodedToken.uid).get();
+      if (userDoc.exists) {
+        role = userDoc.data().role || role;
+      }
+    } catch (roleError) {
+      console.error('Failed to resolve user role from Firestore:', roleError);
+    }
+
+    // Attach user info to request
     req.user = {
       _id: decodedToken.uid,
       uid: decodedToken.uid,
       email: decodedToken.email,
       emailVerified: decodedToken.email_verified,
       displayName: decodedToken.name || null,
-      role: decodedToken.role || 'user',
+      role,
       phoneNumber: decodedToken.phone_number || null,
     };
 

@@ -126,8 +126,9 @@ exports.updatePost = async (req, res) => {
       return res.status(404).json({ message: 'Post not found' });
     }
 
-    // Check if user is the author
-    if (post.authorId !== req.user.uid) {
+    const isOwner = post.authorId === req.user.uid;
+    const isAdmin = req.user.role === 'admin';
+    if (!isOwner && !isAdmin) {
       return res.status(403).json({ message: 'You are not authorized to update this post' });
     }
 
@@ -152,8 +153,9 @@ exports.deletePost = async (req, res) => {
       return res.status(404).json({ message: 'Post not found' });
     }
 
-    // Check if user is the author
-    if (post.authorId !== req.user.uid) {
+    const isOwner = post.authorId === req.user.uid;
+    const isAdmin = req.user.role === 'admin';
+    if (!isOwner && !isAdmin) {
       return res.status(403).json({ message: 'You are not authorized to delete this post' });
     }
 
