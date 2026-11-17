@@ -2,11 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-const authMiddleware = require('./middleware/auth');
 
-// Load environment variables
+// Load environment variables before requiring auth middleware
 const env = process.env.NODE_ENV || 'development';
 dotenv.config({ path: `.env.${env}` });
+
+const authMiddleware = require('./middleware/auth');
 
 // Initialize express app
 const app = express();
