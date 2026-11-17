@@ -1,20 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const curtainController = require('../controllers/curtain.controller');
+const auth = require('../middleware/auth');
 
-// Get all curtains
+// Public read-only routes
 router.get('/', curtainController.getAllCurtains);
-
-// Get a specific curtain
 router.get('/:id', curtainController.getCurtainById);
 
-// Create a new curtain
-router.post('/', curtainController.createCurtain);
+// Protected routes - require authentication
+router.post('/', auth, curtainController.createCurtain);
+router.put('/:id', auth, curtainController.updateCurtain);
+router.delete('/:id', auth, curtainController.deleteCurtain);
 
-// Update a curtain
-router.put('/:id', curtainController.updateCurtain);
-
-// Delete a curtain
-router.delete('/:id', curtainController.deleteCurtain);
-
-module.exports = router; 
+module.exports = router;

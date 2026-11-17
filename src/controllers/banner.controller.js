@@ -3,7 +3,8 @@ const Banner = require('../models/banner.model');
 // Get all active banners
 exports.getAllBanners = async (req, res) => {
   try {
-    const banners = await Banner.find({ isActive: true }).sort({ order: 1 });
+    const includeInactive = req.query.includeInactive === 'true';
+    const banners = await Banner.find(includeInactive ? {} : { isActive: true }).sort({ order: 1 });
     res.status(200).json(banners);
   } catch (error) {
     console.error('Error fetching banners:', error);

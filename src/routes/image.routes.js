@@ -1,17 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const imageController = require('../controllers/image.controller');
+const auth = require('../middleware/auth');
 
-// Lấy tất cả hình ảnh của một sản phẩm
+// Public read-only route
 router.get('/curtain/:curtainId', imageController.getImagesByCurtainId);
 
-// Thêm hình ảnh cho sản phẩm
-router.post('/curtain/:curtainId', imageController.addImageToCurtain);
+// Protected routes - require authentication
+router.post('/curtain/:curtainId', auth, imageController.addImageToCurtain);
+router.put('/:imageId', auth, imageController.updateImage);
+router.delete('/:imageId', auth, imageController.deleteImage);
 
-// Cập nhật thông tin hình ảnh
-router.put('/:imageId', imageController.updateImage);
-
-// Xóa hình ảnh
-router.delete('/:imageId', imageController.deleteImage);
-
-module.exports = router; 
+module.exports = router;

@@ -11,8 +11,8 @@
 # Environment variables
 .env.local
 .env.development
+.env.production
 .env.test
-# .env.production
 .env*.local
 
 # Build
