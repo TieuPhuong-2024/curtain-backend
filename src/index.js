@@ -77,6 +77,7 @@ const favoriteRoutes = require('./routes/favorite.routes');
 const contactRoutes = require('./routes/contact.routes');
 const postRoutes = require('./routes/post.routes');
 const colorRoutes = require('./routes/color.routes');
+const settingRoutes = require('./routes/setting.routes');
 
 // Public read-only routes (no auth required)
 app.use('/api/banners', bannerRoutes);
@@ -93,6 +94,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/contacts', contactRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/settings', settingRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
