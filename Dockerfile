@@ -1,5 +1,7 @@
 # syntax=docker/dockerfile:1
-FROM node:22-alpine
+# Digest-pinned for reproducible rebuilds. To bump, run
+# `docker buildx imagetools inspect node:22-alpine` and update the digest.
+FROM node:22-alpine@sha256:1314fb30ec37592d5845e5a160d522c0e680972aa534549940b8d73bde88481a
 
 ENV NODE_ENV=production \
     NPM_CONFIG_UPDATE_NOTIFIER=false
