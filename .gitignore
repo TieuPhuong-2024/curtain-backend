@@ -2,7 +2,6 @@
 
 # Dependencies
 /node_modules
-/package-lock.json
 /yarn.lock
 /pnpm-lock.yaml
 /.pnp
@@ -87,7 +86,6 @@ target/
 
 # Docker
 *.dockerfile
-.dockerignore
 
 # Database
 *.sqlite
