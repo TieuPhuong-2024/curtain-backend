@@ -11,6 +11,7 @@ const authMiddleware = require('./middleware/auth');
 
 // Initialize express app
 const app = express();
+app.set('trust proxy', 1);
 
 // Simple in-memory rate limiter (requests per window per IP)
 const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS) || 60 * 1000; // 1 minute
