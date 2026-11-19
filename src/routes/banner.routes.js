@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../middleware/auth');
 const bannerController = require('../controllers/banner.controller');
 
 // GET all banners
@@ -9,12 +10,12 @@ router.get('/', bannerController.getAllBanners);
 router.get('/:id', bannerController.getBannerById);
 
 // POST create a new banner
-router.post('/', bannerController.createBanner);
+router.post('/', auth, bannerController.createBanner);
 
 // PUT update a banner
-router.put('/:id', bannerController.updateBanner);
+router.put('/:id', auth, bannerController.updateBanner);
 
 // DELETE a banner
-router.delete('/:id', bannerController.deleteBanner);
+router.delete('/:id', auth, bannerController.deleteBanner);
 
 module.exports = router;

@@ -2,7 +2,6 @@
 
 # Dependencies
 /node_modules
-/package-lock.json
 /yarn.lock
 /pnpm-lock.yaml
 /.pnp
@@ -11,9 +10,10 @@
 # Environment variables
 .env.local
 .env.development
+.env.production
 .env.test
-# .env.production
 .env*.local
+.env
 
 # Build
 /dist
@@ -87,7 +87,6 @@ target/
 
 # Docker
 *.dockerfile
-.dockerignore
 
 # Database
 *.sqlite

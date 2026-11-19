@@ -65,49 +65,52 @@ exports.getPostById = async (req, res) => {
       return res.status(404).json({ message: 'Post not found' });
     }
 
-    // Lấy thông tin client
-    const ip = req.ip || req.connection.remoteAddress;
-    const userAgent = req.headers['user-agent'];
-    const MIN_VIEW_INTERVAL = 5 * 60 * 1000; // 5 phút (trong milliseconds)
+    if (req.query.recordView !== 'false') {
+      // Lấy thông tin client
+      const ip = req.ip || req.connection.remoteAddress;
+      const userAgent = req.headers['user-agent'];
+      const MIN_VIEW_INTERVAL = 5 * 60 * 1000; // 5 phút (trong milliseconds)
 
-    try {
-      // Tìm bản ghi view hiện tại
-      let view = await PostView.findOne({ postId: post._id, ip });
-      const now = new Date();
+      try {
+        // Tìm bản ghi view hiện tại
+        let view = await PostView.findOne({ postId: post._id, ip });
+        const now = new Date();
 
-      if (!view) {
-        // Nếu là lượt xem mới (chưa có trong 24h gần đây)
-        view = new PostView({
-          postId: post._id,
-          ip,
-          userAgent,
-          lastViewedAt: now,
-          viewCount: 1
-        });
-        await view.save();
-        
-        // Tăng cả hai loại view count
-        post.viewCount += 1;
-        post.uniqueViewCount += 1;
-      } else {
-        // Kiểm tra thời gian giữa các lượt xem
-        const timeSinceLastView = now - view.lastViewedAt;
-        
-        if (timeSinceLastView >= MIN_VIEW_INTERVAL) {
-          // Chỉ tăng view count nếu đã đủ thời gian
-          view.viewCount += 1;
-          view.lastViewedAt = now;
+        if (!view) {
+          // Nếu là lượt xem mới (chưa có trong 24h gần đây)
+          view = new PostView({
+            postId: post._id,
+            ip,
+            userAgent,
+            lastViewedAt: now,
+            viewCount: 1
+          });
           await view.save();
           
+          // Tăng cả hai loại view count
           post.viewCount += 1;
+          post.uniqueViewCount += 1;
+        } else {
+          // Kiểm tra thời gian giữa các lượt xem
+          const timeSinceLastView = now - view.lastViewedAt;
+          
+          if (timeSinceLastView >= MIN_VIEW_INTERVAL) {
+            // Chỉ tăng view count nếu đã đủ thời gian
+            view.viewCount += 1;
+            view.lastViewedAt = now;
+            await view.save();
+            
+            post.viewCount += 1;
+          }
         }
+      } catch (viewError) {
+        console.error('Error processing view:', viewError);
+        // Vẫn trả về bài viết ngay cả khi có lỗi xử lý view
       }
-    } catch (viewError) {
-      console.error('Error processing view:', viewError);
-      // Vẫn trả về bài viết ngay cả khi có lỗi xử lý view
+
+      await post.save();
     }
 
-    await post.save();
     res.status(200).json(post);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -123,8 +126,9 @@ exports.updatePost = async (req, res) => {
       return res.status(404).json({ message: 'Post not found' });
     }
 
-    // Check if user is the author
-    if (post.authorId !== req.user.uid) {
+    const isOwner = post.authorId === req.user.uid;
+    const isAdmin = req.user.role === 'admin';
+    if (!isOwner && !isAdmin) {
       return res.status(403).json({ message: 'You are not authorized to update this post' });
     }
 
@@ -149,8 +153,9 @@ exports.deletePost = async (req, res) => {
       return res.status(404).json({ message: 'Post not found' });
     }
 
-    // Check if user is the author
-    if (post.authorId !== req.user.uid) {
+    const isOwner = post.authorId === req.user.uid;
+    const isAdmin = req.user.role === 'admin';
+    if (!isOwner && !isAdmin) {
       return res.status(403).json({ message: 'You are not authorized to delete this post' });
     }
 
